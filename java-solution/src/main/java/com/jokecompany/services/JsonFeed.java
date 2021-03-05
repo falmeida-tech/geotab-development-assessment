@@ -18,12 +18,18 @@ public class JsonFeed {
 
     private HashMap<String, String> names = new HashMap<>();
 
-    public JsonFeed() {
+    private int results;
+
+    public JsonFeed(){
 
     }
 
     public void setNames(HashMap<String, String> names) {
         this.names = names;
+    }
+
+    public void setResults(int results) {
+        this.results = results;
     }
 
     public String[] getRandomJokes(String category) throws JsonFeedException {
@@ -36,7 +42,7 @@ public class JsonFeed {
 
         String baseUrl = "https://api.chucknorris.io/jokes/random";
 
-        String[] randomJokes = null;
+        String[] randomJokes = new String[results];
 
         Gson jsonObject = new GsonBuilder().disableHtmlEscaping().create();
 
@@ -46,22 +52,29 @@ public class JsonFeed {
         HttpClient client = HttpClient.newHttpClient();
 
         try{
+
             URI uri = new URI(baseUrl);
+
             HttpRequest request = HttpRequest.newBuilder().uri(uri).build();
-            String joke = client.send(request, HttpResponse.BodyHandlers.ofString()).body();
 
-            if(joke.contains("404")){
-                throw new JsonFeedException("HTTP Response Code 404 - Resource does not exist");
+            for(int i = 0; i < results; i++){
+
+                String joke = client.send(request, HttpResponse.BodyHandlers.ofString()).body();
+
+                if(joke.contains("404")){
+                    throw new JsonFeedException("HTTP Response Code 404 - Resource does not exist");
+                }
+
+                if (StringUtils.isNoneEmpty(firstName) && StringUtils.isNoneEmpty(lastName)) {
+                    int index = joke.indexOf("Chuck Norris");
+                    String firstPart = joke.substring(0, index);
+                    String secondPart = joke.substring(index + "Chuck Norris".length());
+                    joke = firstPart + " " + firstName + " " + lastName + secondPart;
+                }
+
+                randomJokes[i] = jsonObject.toJson(joke);
+
             }
-
-            if (StringUtils.isNoneEmpty(firstName) && StringUtils.isNoneEmpty(lastName)) {
-                int index = joke.indexOf("Chuck Norris");
-                String firstPart = joke.substring(0, index);
-                String secondPart = joke.substring(index + "Chuck Norris".length());
-                joke = firstPart + " " + firstName + " " + lastName + secondPart;
-            }
-
-            randomJokes = new String[] {jsonObject.toJson(joke)};
 
         }catch(URISyntaxException | IOException | InterruptedException e){
             throw new JsonFeedException(e.getMessage());

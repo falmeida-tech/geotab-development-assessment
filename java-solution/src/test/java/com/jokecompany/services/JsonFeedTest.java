@@ -26,13 +26,36 @@ public class JsonFeedTest {
     }
 
     @Test
-    public void testGetRandomJokes_condition_provide_existing_category() throws JsonFeedException {
+    public void testGetRandomJokes_condition_provide_existing_category_one_joke() throws JsonFeedException {
         HashMap<String,String> names = new HashMap<>();
         names.put("Firstname","Lastname");
         JsonFeed jsonFeed = new JsonFeed();
         jsonFeed.setNames(names);
+        jsonFeed.setResults(1);
         String[] randomJokes = jsonFeed.getRandomJokes("food");
         assertEquals(randomJokes.length,1);
+    }
+
+    @Test
+    public void testGetRandomJokes_condition_non_category_three_jokes() throws JsonFeedException {
+        HashMap<String,String> names = new HashMap<>();
+        names.put("Firstname","Lastname");
+        JsonFeed jsonFeed = new JsonFeed();
+        jsonFeed.setNames(names);
+        jsonFeed.setResults(3);
+        String[] randomJokes = jsonFeed.getRandomJokes(null);
+        assertEquals(randomJokes.length,3);
+    }
+
+    @Test
+    public void testGetRandomJokes_condition_provide_non_category_nine_jokes() throws JsonFeedException {
+        HashMap<String,String> names = new HashMap<>();
+        names.put("Firstname","Lastname");
+        JsonFeed jsonFeed = new JsonFeed();
+        jsonFeed.setNames(names);
+        jsonFeed.setResults(9);
+        String[] randomJokes = jsonFeed.getRandomJokes(null);
+        assertEquals(randomJokes.length,9);
     }
 
     @Test(expected = JsonFeedException.class)
@@ -40,8 +63,10 @@ public class JsonFeedTest {
         HashMap<String,String> names = new HashMap<>();
         names.put("Firstname","Lastname");
         JsonFeed jsonFeed = new JsonFeed();
+        jsonFeed.setResults(1);
         jsonFeed.setNames(names);
         String[] randomJokes = jsonFeed.getRandomJokes("invalid_category");
+        assertEquals(randomJokes.length, 1);
     }
 
 }

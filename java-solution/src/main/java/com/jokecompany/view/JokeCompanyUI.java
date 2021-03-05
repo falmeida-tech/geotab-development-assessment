@@ -5,7 +5,6 @@ import com.jokecompany.exceptions.JsonFeedException;
 import com.jokecompany.model.FullNameDTO;
 import com.jokecompany.services.JsonFeed;
 import com.jokecompany.utilities.ConsolePrinter;
-import org.apache.commons.lang3.StringUtils;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -52,16 +51,17 @@ public class JokeCompanyUI {
         readUserInput(reader);
     }
 
-    public void showRandomJokes(BufferedReader reader) throws IOException {
+    public void showRandomJokes(BufferedReader reader) throws IOException, JsonFeedException {
         printer.Value("How many jokes do you want? (1-9)").toString();
-        int n = Integer.parseInt(reader.readLine());
-//        jsonFeed.getRandomJokes(null, n);
+        int number = Integer.parseInt(reader.readLine());
+        jsonFeed.setResults(number);
+        results = jsonFeed.getRandomJokes(null);
         PrintResults();
     }
 
     public void showRandomJokesByCategory(BufferedReader reader) throws IOException, JsonFeedException {
         printer.Value("How many jokes do you want? (1-9)").toString();
-        int n = Integer.parseInt(reader.readLine());
+        int number = Integer.parseInt(reader.readLine());
         printer.Value("Enter a category;").toString();
         String category = reader.readLine();
         results = jsonFeed.getRandomJokes(category);
@@ -129,16 +129,5 @@ public class JokeCompanyUI {
     private static void PrintResults() {
         printer.Value("[" + String.join(",", results) + "]").toString();
     }
-
-    /*private static void getRandomJokes(String category, int number) throws InterruptedException, IOException, URISyntaxException {
-        var var1 = names.entrySet().iterator().next();
-        new JsonFeed("https://api.chucknorris.io/jokes/", number);
-        results = JsonFeed.getRandomJokes(var1.getKey(), var1.getValue(), category);
-    }*/
-
-    /*private static void getCategories() throws InterruptedException, IOException, URISyntaxException {
-        new JsonFeed("https://api.chucknorris.io/jokes/", 0);
-        results = JsonFeed.getCategories();
-    }*/
 
 }
