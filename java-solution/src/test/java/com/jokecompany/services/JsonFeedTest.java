@@ -47,7 +47,11 @@ public class JsonFeedTest {
         assertEquals(randomJokes.length,3);
     }
 
-    @Test
+    /**
+     * It defines a threshold for high latency tests
+     * @throws JsonFeedException
+     */
+    @Test(timeout = 5000)
     public void testGetRandomJokes_condition_provide_non_category_nine_jokes() throws JsonFeedException {
         HashMap<String,String> names = new HashMap<>();
         names.put("Firstname","Lastname");

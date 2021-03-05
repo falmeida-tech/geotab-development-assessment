@@ -2,7 +2,7 @@ package com.jokecompany.utilities;
 
 public class ConsolePrinter {
 
-    public static Object PrintValue;
+    private static Object PrintValue;
 
     public ConsolePrinter Value(String value){
         PrintValue = value;

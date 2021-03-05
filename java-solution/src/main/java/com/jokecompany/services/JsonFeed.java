@@ -24,14 +24,28 @@ public class JsonFeed {
 
     }
 
+    /**
+     * Assign the names of the collect during APIs calls
+     * @param names
+     */
     public void setNames(HashMap<String, String> names) {
         this.names = names;
     }
 
+    /**
+     * Set the number of jokes to be returned
+     * @param results
+     */
     public void setResults(int results) {
         this.results = results;
     }
 
+    /**
+     * This method get one or more Random Jokes by using a category or not
+     * @param category
+     * @return
+     * @throws JsonFeedException
+     */
     public String[] getRandomJokes(String category) throws JsonFeedException {
 
         var var1 = names.entrySet().iterator().next();
