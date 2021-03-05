@@ -12,39 +12,62 @@ import java.net.URISyntaxException;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.HashMap;
 
 public class JsonFeed {
 
-    static String url = "";
+    private HashMap<String, String> names = new HashMap<>();
 
     public JsonFeed() {
 
     }
 
-    public JsonFeed(String endpoint, int results) {
-
-        url = endpoint;
-
+    public void setNames(HashMap<String, String> names) {
+        this.names = names;
     }
 
-    public static String[] getRandomJokes(String firstname, String lastname, String category) throws URISyntaxException, IOException, InterruptedException {
+    public String[] getRandomJokes(String category) throws JsonFeedException {
+
+        var var1 = names.entrySet().iterator().next();
+
+        final String firstName = var1.getKey();
+
+        final String lastName = var1.getValue();
+
         String baseUrl = "https://api.chucknorris.io/jokes/random";
 
+        String[] randomJokes = null;
+
+        Gson jsonObject = new GsonBuilder().disableHtmlEscaping().create();
+
         if (StringUtils.isNoneEmpty(category))
-            baseUrl += category;
+            baseUrl += "?category=" + category;
 
         HttpClient client = HttpClient.newHttpClient();
-        URI uri = new URI(baseUrl);
-        HttpRequest request = HttpRequest.newBuilder().uri(uri).build();
-        String joke = client.send(request, HttpResponse.BodyHandlers.ofString()).body();
-        if (firstname != null && lastname != null) {
-            int index = joke.indexOf("Chuck Norris");
-            String firstPart = joke.substring(0, index);
-            String secondPart = joke.substring(index + "Chuck Norris".length());
-            joke = firstPart + " " + firstname + " " + lastname + secondPart;
+
+        try{
+            URI uri = new URI(baseUrl);
+            HttpRequest request = HttpRequest.newBuilder().uri(uri).build();
+            String joke = client.send(request, HttpResponse.BodyHandlers.ofString()).body();
+
+            if(joke.contains("404")){
+                throw new JsonFeedException("HTTP Response Code 404 - Resource does not exist");
+            }
+
+            if (StringUtils.isNoneEmpty(firstName) && StringUtils.isNoneEmpty(lastName)) {
+                int index = joke.indexOf("Chuck Norris");
+                String firstPart = joke.substring(0, index);
+                String secondPart = joke.substring(index + "Chuck Norris".length());
+                joke = firstPart + " " + firstName + " " + lastName + secondPart;
+            }
+
+            randomJokes = new String[] {jsonObject.toJson(joke)};
+
+        }catch(URISyntaxException | IOException | InterruptedException e){
+            throw new JsonFeedException(e.getMessage());
         }
-        Gson jsonobject = new GsonBuilder().disableHtmlEscaping().create();
-        return new String[] {jsonobject.toJson(joke)};
+
+        return randomJokes;
     }
 
     /**
@@ -59,20 +82,34 @@ public class JsonFeed {
             URI uri = new URI(baseUrl);
             HttpClient client = HttpClient.newHttpClient();
             HttpRequest request = HttpRequest.newBuilder().uri(uri).build();
-            String names = client.send(request, HttpResponse.BodyHandlers.ofString()).body();
-            fullNameDTO = gson.fromJson(names, FullNameDTO.class);
+            String namesResponse = client.send(request, HttpResponse.BodyHandlers.ofString()).body();
+            fullNameDTO = gson.fromJson(namesResponse, FullNameDTO.class);
+            names.put(fullNameDTO.getName(), fullNameDTO.getSurname());
         } catch (URISyntaxException | IOException | InterruptedException e) {
             throw new JsonFeedException(e.getMessage());
         }
         return fullNameDTO;
     }
 
-    public static String[] getCategories() throws IOException, InterruptedException, URISyntaxException {
-        HttpClient client = HttpClient.newHttpClient();
-        URI uri = new URI(url);
-        HttpRequest request = HttpRequest.newBuilder().uri(uri).build();
-        String responsebody = client.send(request, HttpResponse.BodyHandlers.ofString()).body();
-        return new String[] {new Gson().toJson(responsebody)};
+    /**
+     *
+     * @return
+     * @throws JsonFeedException
+     */
+    public String[] getCategories() throws JsonFeedException {
+        Gson gson = new GsonBuilder().create();
+        final String baseUrl = "https://api.chucknorris.io/jokes/categories";
+        String[] categories = null;
+        try{
+            HttpClient client = HttpClient.newHttpClient();
+            URI uri = new URI(baseUrl);
+            HttpRequest request = HttpRequest.newBuilder().uri(uri).build();
+            String responsebody = client.send(request, HttpResponse.BodyHandlers.ofString()).body();
+            categories = gson.fromJson(responsebody, String[].class);
+        }catch (InterruptedException | URISyntaxException | IOException e) {
+            throw new JsonFeedException(e.getMessage());
+        }
+        return categories;
     }
 
 }

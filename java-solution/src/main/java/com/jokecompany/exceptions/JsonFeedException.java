@@ -10,15 +10,4 @@ public class JsonFeedException extends Exception{
         super(message);
     }
 
-    public JsonFeedException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
-    public JsonFeedException(Throwable cause) {
-        super(cause);
-    }
-
-    public JsonFeedException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
-        super(message, cause, enableSuppression, writableStackTrace);
-    }
 }

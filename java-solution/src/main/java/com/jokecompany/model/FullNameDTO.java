@@ -27,7 +27,7 @@ public class FullNameDTO {
 
     @Override
     public String toString() {
-        return "DTO{" + "name='" + name + '\'' + ", surname='" + surname + '\'' + '}';
+        return "FullNameDTO {" + "name='" + name + '\'' + ", " + "surname='" + surname + '\'' + '}';
     }
 
 }
